@@ -1,0 +1,53 @@
+{
+  "parking_lot_info": [
+    {
+      "parking_id": 0,
+      "parking_name": "停车场10",
+      "address": "西湖区湖底公园0号湖底公园0号湖底公园0号",
+      "lng": 116.6521,
+      "lat": 31.5021
+    },
+    {
+      "parking_id": 1,
+      "parking_name": "停车场11",
+      "address": "西湖区湖底公园1号",
+      "lng": 116.6621,
+      "lat": 31.7021
+    },
+    {
+      "parking_id": 2,
+      "parking_name": "停车场12",
+      "address": "西湖区湖底公园2号",
+      "lng": 116.6821,
+      "lat": 31.9021
+    },
+    {
+      "parking_id": 3,
+      "parking_name": "停车场13",
+      "address": "西湖区湖底公园3号",
+      "lng": 116.6921,
+      "lat": 31.6021
+    },
+    {
+      "parking_id": 4,
+      "parking_name": "停车场14",
+      "address": "西湖区湖底公园4号",
+      "lng": 117.6521,
+      "lat": 31.2021
+    },
+    {
+      "parking_id": 5,
+      "parking_name": "停车场15",
+      "address": "西湖区湖底公园5号",
+      "lng": 116.6521,
+      "lat": 31.1021
+    },
+    {
+      "parking_id": 6,
+      "parking_name": "停车场16",
+      "address": "西湖区湖底公园6号",
+      "lng": 116.6521,
+      "lat": 31.0021
+    }
+  ]
+}
