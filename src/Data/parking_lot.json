@@ -2,24 +2,24 @@
   "parking_lot_info": [
     {
       "parking_id": 0,
-      "parking_name": "停车场0",
-      "address": "西湖区湖底公园0号湖底公园0号湖底公园0号",
-      "lng": 116.5521,
-      "lat": 31.5021
+      "parking_name": "万寿路停车场",
+      "address": "万寿路广场景苑北侧",
+      "lng": 115.919115,
+      "lat": 31.852714
     },
     {
       "parking_id": 1,
-      "parking_name": "停车场1",
-      "address": "西湖区湖底公园1号",
-      "lng": 116.5621,
-      "lat": 31.7021
+      "parking_name": "花园路政务区停车场",
+      "address": "花园路政务区南区西侧",
+      "lng": 115.924343,
+      "lat": 31.860624
     },
     {
       "parking_id": 2,
-      "parking_name": "停车场2",
-      "address": "西湖区湖底公园2号",
-      "lng": 116.5821,
-      "lat": 31.9021
+      "parking_name": "二小东停车场",
+      "address": "柳林大道二小东侧",
+      "lng": 115.930096,
+      "lat": 31.858446
     },
     {
       "parking_id": 3,

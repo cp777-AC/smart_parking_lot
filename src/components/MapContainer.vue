@@ -13,12 +13,12 @@
     :footer="null">
     <a-list class="demo-loadmore-list" :loading="initNearbyLoading" item-layout="horizontal"
       :data-source="dataSource_nearby" :pagination=false :locale="{ emptyText: '暂无数据' }">
-      <template #loadMore>
+      <!-- <template #loadMore>
         <div v-if="!initNearbyLoading && !loading"
           :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }">
           <a-button @click="onLoadMore">加载更多</a-button>
         </div>
-      </template>
+      </template> -->
       <template #renderItem="{ item }">
         <a-list-item>
           <template #actions>
@@ -72,8 +72,8 @@ import { shallowRef, onMounted, ref } from 'vue'
 import {
   BarsOutlined,
 } from '@ant-design/icons-vue';
-const parking_lot_nearby = require('../Mock/parking_lot.json')
-const parking_lot_search = require('../Mock/parking_lot_search.json')
+import { message } from 'ant-design-vue';
+const parking_lot_nearby = require('../Data/parking_lot.json')
 
 const map = shallowRef(null)
 let parking_nearby_info = ref([])
@@ -87,8 +87,9 @@ const open_nearby = ref(false);
 const open_search = ref(false);
 const initNearbyLoading = ref(true);
 const initSearchLoading = ref(true);
-// TODO
-const loading = ref(false);
+// const loading = ref(false);
+// 模糊搜索
+let filterMsg = ref([])
 
 const showNearbyModal = () => {
   getParkingLotNearbyInfo()
@@ -158,9 +159,7 @@ const initMap = () => {
 // 页面挂载完成
 onMounted(() => {
   initMap()
-  // fetch.then
   initNearbyLoading.value = false;
-  
 })
 
 // 自身定位
@@ -174,7 +173,6 @@ const position_self = () => {
         position: 'RB', //  定位按钮的排放位置,  RB表示右下
       },
       showCircle: false,
-      //属性：
     });
     map.value && map.value.addControl(geolocation);
     geolocation.getCurrentPosition((status, result) => {
@@ -206,7 +204,7 @@ const onComplete = (result) => {
   map.value.setFitView()
   getParkingLotNearbyInfo()
   const elA = document.querySelector('.amap-geolocation')
-  elA?.addEventListener('click', ()=> {
+  elA?.addEventListener('click', () => {
     getParkingLotNearbyInfo()
   })
 }
@@ -216,38 +214,43 @@ const onError = (err) => {
   console.log('定位出错', err)
 }
 
-// 请求停车场数据
+// 获取停车场数据
 const getParkingLotNearbyInfo = () => {
   map.value && map.value.clearMap();
   parking_nearby_info.value = parking_lot_nearby.parking_lot_info
   dataSource_nearby.value = []
   parking_nearby_info.value.forEach((item) => {
     let distance = currentAMap.GeometryUtil.distance(currentPosition.value, [item.lng, item.lat])
-    if (distance >= 5) {
-      dataSource_nearby.value.push({
-        parking_name: item.parking_name,
-        address: item.address,
-        lng: item.lng,
-        lat: item.lat,
-        distance,
-      })
-      const marker = new currentAMap.Marker({
-        position: [item.lng, item.lat],
-        title: item.parking_name
-      });
-      map.value && map.value.add(marker)
-      marker.on('click', function (e) {
-        openInfoWindow(e, item)
-      })
-    }
+    // if (distance <= 500) {
+    dataSource_nearby.value.push({
+      parking_name: item.parking_name,
+      address: item.address,
+      lng: item.lng,
+      lat: item.lat,
+      distance,
+    })
+    const marker = new currentAMap.Marker({
+      position: [item.lng, item.lat],
+      title: item.parking_name
+    });
+    map.value && map.value.add(marker)
+    marker.on('click', function (e) {
+      openInfoWindow(e, item)
+    })
+    // }
   })
   dataSource_nearby.value.sort(compare('distance', true))
 }
 
 // 搜索停车场数据
 const getParkingLotSearchInfo = () => {
+  if (!searchValue.value) {
+    message.info('请输入关键词', [2])
+    initSearchLoading.value = false;
+    return
+  }
+  handleSearch()
   map.value && map.value.clearMap();
-  parking_search_info.value = parking_lot_search.parking_lot_info
   dataSource_search.value = []
   parking_search_info.value.forEach((item) => {
     let distance = currentAMap.GeometryUtil.distance(currentPosition.value, [item.lng, item.lat])
@@ -266,9 +269,23 @@ const getParkingLotSearchInfo = () => {
     marker.on('click', function (e) {
       openInfoWindow(e, item)
     })
-
   })
   initSearchLoading.value = false;
+  showSearchModal()
+}
+
+const handleSearch = () => {
+  parking_search_info.value = []
+  let queryStringArr = searchValue.value.split("");
+  let str = "(.*?)";
+  filterMsg.value = [];
+  let regStr = str + queryStringArr.join(str) + str;
+  let reg = RegExp(regStr, "i"); // 以mh为例生成的正则表达式为/(.*?)m(.*?)h(.*?)/i
+  parking_nearby_info.value.forEach(item => {
+    if (reg.test(item.parking_name || item.address)) {
+      parking_search_info.value.push(item)
+    }
+  });
 }
 
 // 排序   desc=true: 正序
@@ -332,11 +349,8 @@ const closeInfoWindow = () => {
 
 const openInfoWindow = (e, item) => {
   // //实例化信息窗体
-  // var title = '方恒假日酒店<span style="font-size:11px;color:#F00;">价格:318</span>',
   var content = [];
   content.push(`<a href='${navigation(item)}'>到这去</a>`);
-  // content.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
-
   var title = '<div style="font-size:20px;color:#F00;font-weight:bold;">' + item.parking_name + '</div>'
 
   // 创建 infoWindow 实例
@@ -346,12 +360,7 @@ const openInfoWindow = (e, item) => {
     offset: new currentAMap.Pixel(15, -50)
   });
 
-
   infoWindow.open(map.value, e.target.getPosition());
-
-  // https://lbs.amap.com/api/uri-api/guide/travel/route
-  // https://uri.amap.com/navigation?from=116.478346,39.997361,startpoint&to=116.3246,39.966577,endpoint&mode=car&policy=0&src=mypage&coordinate=gaode&callnative=1
-
 }
 
 const navigation = (item) => {
@@ -361,23 +370,17 @@ const navigation = (item) => {
 const onSearch = (v) => {
   searchValue.value = v && v.trim()
   getParkingLotSearchInfo()
-  showSearchModal()
 }
 
 const onPosition = (position) => {
   open_nearby.value = false;
   map.value.setCenter(position)
-  // openInfoWindow()
 }
 
 const onSearchPosition = (position) => {
   open_search.value = false;
   map.value.setCenter(position)
-  // openInfoWindow()
 }
-
-const onLoadMore = () => { }
-
 
 </script>
 
