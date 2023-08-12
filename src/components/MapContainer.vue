@@ -13,12 +13,6 @@
     :footer="null">
     <a-list class="demo-loadmore-list" :loading="initNearbyLoading" item-layout="horizontal"
       :data-source="dataSource_nearby" :pagination=false :locale="{ emptyText: '暂无数据' }">
-      <!-- <template #loadMore>
-        <div v-if="!initNearbyLoading && !loading"
-          :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }">
-          <a-button @click="onLoadMore">加载更多</a-button>
-        </div>
-      </template> -->
       <template #renderItem="{ item }">
         <a-list-item>
           <template #actions>
@@ -50,7 +44,6 @@
               <a>查看停车场</a>
             </a>
           </template>
-
           <a-list-item-meta>
             <template #title>
               <div>{{ item.parking_name }}</div>
@@ -198,7 +191,6 @@ const onComplete = (result) => {
     fillColor: '#1791fc',
     zIndex: 50,
   })
-
   map.value && map.value.add(circle);
   // 缩放地图到合适的视野级别
   map.value.setFitView()
@@ -235,7 +227,7 @@ const getParkingLotNearbyInfo = () => {
     });
     map.value && map.value.add(marker)
     marker.on('click', function (e) {
-      openInfoWindow(e, item)
+      openInfoWindow(e, item, distance)
     })
     // }
   })
@@ -267,7 +259,7 @@ const getParkingLotSearchInfo = () => {
     });
     map.value && map.value.add(marker)
     marker.on('click', function (e) {
-      openInfoWindow(e, item)
+      openInfoWindow(e, item, distance)
     })
   })
   initSearchLoading.value = false;
@@ -347,11 +339,15 @@ const closeInfoWindow = () => {
   map.value.clearInfoWindow();
 }
 
-const openInfoWindow = (e, item) => {
+const openInfoWindow = (e, item, distance) => {
+  console.log('item', item)
   // //实例化信息窗体
   var content = [];
-  content.push(`<a href='${navigation(item)}'>到这去</a>`);
-  var title = '<div style="font-size:20px;color:#F00;font-weight:bold;">' + item.parking_name + '</div>'
+  content.push(`
+  <div style="font-size:15px;">${item.address}</div>
+  <div style="font-size:15px;">距您${parseInt(distance)}米</div>
+  <button class="btn-nav"><a class="a-nav" href='${navigation(item)}' style="font: 20px black;">到这去</a></button>`);
+  var title = '<div style="font-size:20px;color:black;font-weight:bold;">' + item.parking_name + '</div>'
 
   // 创建 infoWindow 实例
   var infoWindow = new currentAMap.InfoWindow({
@@ -509,6 +505,24 @@ span {
   position: relative;
   right: 5px;
   top: 50px;
+}
+
+.btn-nav {
+  margin-top: 10px;
+  margin-left: 40px;
+  background-color: #1677ff;
+  /* Green */
+  border: none;
+  border-radius: 12px;
+  color: white;
+  padding: 6px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-bloc
+}
+
+.a-nav {
+  color: black
 }
 </style>
 
