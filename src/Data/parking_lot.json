@@ -23,31 +23,17 @@
     },
     {
       "parking_id": 3,
-      "parking_name": "停车场3",
-      "address": "西湖区湖底公园3号",
-      "lng": 116.5921,
-      "lat": 31.6021
+      "parking_name": "固叶路停车场",
+      "address": "固叶路金河小区西侧",
+      "lng": 115.908075,
+      "lat": 31.865027
     },
     {
       "parking_id": 4,
-      "parking_name": "停车场4",
-      "address": "西湖区湖底公园4号",
-      "lng": 117.5521,
-      "lat": 31.2021
-    },
-    {
-      "parking_id": 5,
-      "parking_name": "停车场5",
-      "address": "西湖区湖底公园5号",
-      "lng": 116.3521,
-      "lat": 31.1021
-    },
-    {
-      "parking_id": 6,
-      "parking_name": "停车场6",
-      "address": "西湖区湖底公园6号",
-      "lng": 116.1521,
-      "lat": 31.0021
+      "parking_name": "民强路社会停车场",
+      "address": "民强路城管局北侧",
+      "lng": 115.913131,
+      "lat": 31.842531
     }
   ]
 }

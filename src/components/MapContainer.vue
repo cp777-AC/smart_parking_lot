@@ -26,7 +26,7 @@
             </template>
             <template #description>
               <div>地址：{{ item.address }}</div>
-              <div>距您{{ parseInt(item.distance) }}米</div>
+              <div>距您{{ parseInt(item.distance / 100) / 10 }}公里</div>
             </template>
           </a-list-item-meta>
         </a-list-item>
@@ -50,7 +50,7 @@
             </template>
             <template #description>
               <div>地址：{{ item.address }}</div>
-              <div>距您{{ parseInt(item.distance) }}米</div>
+              <div>距您{{ parseInt(item.distance / 100) / 10 }}公里</div>
             </template>
           </a-list-item-meta>
         </a-list-item>
@@ -73,6 +73,7 @@ let parking_nearby_info = ref([])
 let parking_search_info = ref([])
 let currentAMap = null
 let currentPosition = ref('')
+let currentPositionName = ref('')
 let searchValue = ref('')
 const dataSource_nearby = ref([])
 const dataSource_search = ref([])
@@ -80,7 +81,6 @@ const open_nearby = ref(false);
 const open_search = ref(false);
 const initNearbyLoading = ref(true);
 const initSearchLoading = ref(true);
-// const loading = ref(false);
 // 模糊搜索
 let filterMsg = ref([])
 
@@ -102,6 +102,9 @@ const handleSearchOk = () => {
 };
 
 const initMap = () => {
+  window._AMapSecurityConfig = {
+    securityJsCode: '36f390deb2e682573a6c7bb0f2523116',
+  }
   AMapLoader.load({
     key: "0bd30b96d926277e6ea7e74e5f8bf37f",             // 申请好的Web端开发者Key，首次调用 load 时必填
     version: "2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
@@ -184,6 +187,23 @@ const onComplete = (result) => {
     lng: result.position.lng,
     lat: result.position.lat
   }
+
+  currentAMap.plugin('AMap.Geocoder', function () {
+    let geocoder = new currentAMap.Geocoder({
+      city: '0564' // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+    })
+
+    let lnglat = [currentPosition.value.lng, currentPosition.value.lat]
+
+    geocoder.getAddress(lnglat, function (status, result) {
+      if (status === 'complete' && result.info === 'OK') {
+        currentPositionName.value = result.regeocode.formattedAddress
+      } else {
+        console.log('Err', result)
+      }
+    })
+  })
+
   var circle = new currentAMap.Circle({
     center: [currentPosition.value.lng, currentPosition.value.lat],
     radius: 500, //半径
@@ -212,7 +232,7 @@ const getParkingLotNearbyInfo = () => {
   parking_nearby_info.value = parking_lot_nearby.parking_lot_info
   dataSource_nearby.value = []
   parking_nearby_info.value.forEach((item) => {
-    let distance = currentAMap.GeometryUtil.distance(currentPosition.value, [item.lng, item.lat])
+    let distance = currentAMap?.GeometryUtil.distance(currentPosition.value, [item.lng, item.lat])
     // if (distance <= 500) {
     dataSource_nearby.value.push({
       parking_name: item.parking_name,
@@ -345,7 +365,7 @@ const openInfoWindow = (e, item, distance) => {
   var content = [];
   content.push(`
   <div style="font-size:15px;">${item.address}</div>
-  <div style="font-size:15px;">距您${parseInt(distance)}米</div>
+  <div style="font-size:15px;">距您${parseInt(distance / 100) / 10}公里</div>
   <button class="btn-nav"><a class="a-nav" href='${navigation(item)}' style="font: 20px black;">到这去</a></button>`);
   var title = '<div style="font-size:20px;color:black;font-weight:bold;">' + item.parking_name + '</div>'
 
@@ -360,7 +380,7 @@ const openInfoWindow = (e, item, distance) => {
 }
 
 const navigation = (item) => {
-  return `https://uri.amap.com/navigation?from=${currentPosition.value.lng},${currentPosition.value.lat},startpoint&to=${item.lng},${item.lat},endpoint&mode=car&policy=0&src=mypage&coordinate=gaode&callnative=1`
+  return `https://uri.amap.com/navigation?from=${currentPosition.value.lng},${currentPosition.value.lat},${currentPositionName.value}&to=${item.lng},${item.lat},${item.parking_name}&mode=car&policy=0&src=mypage&coordinate=gaode&callnative=1`
 }
 
 const onSearch = (v) => {
@@ -386,7 +406,7 @@ const onSearchPosition = (position) => {
   padding: 0;
   margin: 0;
   width: 100%;
-  height: 600px;
+  height: 80vh;
 }
 
 .content-window-card {
@@ -490,7 +510,7 @@ span {
   font-size: 20px !important;
   font-weight: bold;
   position: relative;
-  top: 30px;
+  top: 4vh;
   width: 100%;
   z-index: 100;
 
@@ -504,7 +524,7 @@ span {
 .search-input {
   position: relative;
   right: 5px;
-  top: 50px;
+  top: 4vh;
 }
 
 .btn-nav {
