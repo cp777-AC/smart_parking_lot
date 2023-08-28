@@ -384,20 +384,14 @@ const openInfoWindow = (e, item, distance) => {
 const navigation = (item) => {
   //入参
   var opt = {
-    type: 'BAIDU',//坐标类型 取值BAIDU（默认，BD09坐标系）, GPS（WGS84坐标系）
-    success: function (data) {
-      //成功时回调此方法 
-      message.success(data)
-      console.log(data)
-    },
-    fail: function (data) {
-      //失败时回调此方法   
-      message.fail(data)
-      console.log(data)
-    }
+    desAddress: currentPositionName.value,
+    myLat: currentPosition.value.lat,
+    myLng: currentPosition.value.lng,
+    desLat: item.lat,
+    desLng: item.lng
   }
   //插件调用代码
-  WorkHelper.getGps(opt);
+  WorkHelper.goNativeMap(opt);
   return `https://uri.amap.com/navigation?from=${currentPosition.value.lng},${currentPosition.value.lat},${currentPositionName.value}&to=${item.lng},${item.lat},${item.parking_name}&mode=car&policy=0&src=mypage&coordinate=gaode&callnative=1`
 }
 
